@@ -5,11 +5,13 @@ from Models.cell_model import Cell
 
 class BoardModel:
     # Sets the initial board parameters
-    def __init__(self, rows=8, cols=8, mines=10):
+    def __init__(self, rows=8, cols=8, mines=10, treasures=1):
         self.rows = rows
         self.cols = cols
         self.mines = mines
+        self.treasures = treasures
         self.mine_positions = []
+        self.treasure_positions = []
         self.grid = [[Cell() for _ in range(cols)] for _ in range(rows)]
     
     # Sets up the initial board state. A reengineered version of the setup function.
@@ -24,9 +26,16 @@ class BoardModel:
             [(x, y) for x in range(self.rows) for y in range(self.cols)], self.mines
         )
 
+        self.treasure_positions = random.sample(
+            [(x, y) for x in range(self.rows) for y in range(self.cols) if (x, y) not in self.mine_positions], self.treasures
+        )
+
         # Sets is_mine property to true for each mine position
         for x, y in self.mine_positions:
             self.grid[x][y].is_mine = True
+        
+        for x, y in self.treasure_positions:
+            self.grid[x][y].is_treasure = True
         
         # Determines adjacent mines for each cell
         for x in range(self.rows):
@@ -66,8 +75,8 @@ class BoardModel:
         if cell.is_revealed or cell.is_flagged:
             return
         
-        if cell.adjacent_mines == 0 and not cell.is_mine:
+        if cell.adjacent_mines == 0 and not cell.is_mine and not cell.is_treasure:
             cell.reveal()
             queue.append((x, y))
-        elif cell.adjacent_mines > 0 and not cell.is_mine:
+        elif cell.adjacent_mines > 0 and not cell.is_mine and not cell.is_treasure:
             cell.reveal()

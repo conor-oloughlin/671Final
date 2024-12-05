@@ -52,6 +52,8 @@ class BoardView:
         if cell.is_revealed:
             if cell.is_mine:
                 button.config(image=self.images["mine"])
+            elif cell.is_treasure:
+                button.config(image=self.images["mine"])
             elif cell.adjacent_mines > 0:
                 button.config(image=self.images["numbers"][cell.adjacent_mines - 1])
             else:
