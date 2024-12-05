@@ -3,33 +3,57 @@ from Controllers.game_controller import GameController
 from Views.board_view import BoardView
 from Views.difficulty_view import DifficultyView
 from Views.text_board_view import TextBoardView
+from Views.testing_view import TestingView
+from Controllers.test_controller import TestController
+import time
+import threading
+
+# def wait_for_file_path():
+#     if not(is_waiting):
+#         is_waiting = True
+#         time.sleep(0.1)
+#         is_waiting = False
+#     if testing.file_path is not None:
+#         return True
+#     else:
+#         wait_for_file_path()
 
 if __name__=="__main__":
-    difficulty = DifficultyView()
-    if difficulty.level == "beginner":
-        rows = 8
-        cols = 8
-        mines = 10
-        treasures = 1
-    elif difficulty.level == "intermediate":
-        rows = 16
-        cols = 16
-        mines = 40
-        treasures = 3
-    elif difficulty.level == "expert":
-        rows = 30
-        cols = 16
-        mines = 99
-        treasures = 5
+    is_waiting = False
+    testing = TestingView()
+    if testing.is_testing:
+        file_path = testing.uploadCSV()
+        test_controller = TestController(file_path)
+
     else:
-        rows = 8
-        cols = 8
-        mines = 10
-        treasures = 1
+        difficulty = DifficultyView()
+        if difficulty.level == "beginner":
+            rows = 8
+            cols = 8
+            mines = 10
+            treasures = 1
+        elif difficulty.level == "intermediate":
+            rows = 16
+            cols = 16
+            mines = 40
+            treasures = 3
+        elif difficulty.level == "expert":
+            rows = 30
+            cols = 16
+            mines = 99
+            treasures = 5
+        else:
+            rows = 8
+            cols = 8
+            mines = 10
+            treasures = 1
     
-    board = BoardModel(rows, cols, mines)
-    # view = BoardView(board)  # Graphical view
-    view = TextBoardView(board)  # Text-based view
+    if testing.is_testing:
+        board = test_controller.game_board
+    else:
+        board = BoardModel(rows, cols, mines)
+    view = BoardView(board)  # Graphical view
+    # view = TextBoardView(board)  # Text-based view
     controller = GameController(board, view)
     view.controller = controller
 
@@ -38,3 +62,4 @@ if __name__=="__main__":
             view.promptMove()
     else: 
         view.window.mainloop()
+

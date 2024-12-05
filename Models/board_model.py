@@ -5,7 +5,7 @@ from Models.cell_model import Cell
 
 class BoardModel:
     # Sets the initial board parameters
-    def __init__(self, rows=8, cols=8, mines=10, treasures=1):
+    def __init__(self, rows=8, cols=8, mines=10, treasures=1, mine_positions=None, treasure_positions=None):
         self.rows = rows
         self.cols = cols
         self.mines = mines
@@ -21,14 +21,17 @@ class BoardModel:
         self.clickedCount = 0
         self.startTime = None
 
-        # Creates the mine positions
-        self.mine_positions = random.sample(
-            [(x, y) for x in range(self.rows) for y in range(self.cols)], self.mines
-        )
+        if not self.mine_positions:
+            # Creates the mine positions if positions aren't know
+            self.mine_positions = random.sample(
+                [(x, y) for x in range(self.rows) for y in range(self.cols)], self.mines
+            )
 
-        self.treasure_positions = random.sample(
-            [(x, y) for x in range(self.rows) for y in range(self.cols) if (x, y) not in self.mine_positions], self.treasures
-        )
+        if not self.treasure_positions:
+            # Creates the treasure positions if positions aren't know
+            self.treasure_positions = random.sample(
+                [(x, y) for x in range(self.rows) for y in range(self.cols) if (x, y) not in self.mine_positions], self.treasures
+            )
 
         # Sets is_mine property to true for each mine position
         for x, y in self.mine_positions:
