@@ -2,6 +2,7 @@ from Models.board_model import BoardModel
 from Controllers.game_controller import GameController
 from Views.board_view import BoardView
 from Views.difficulty_view import DifficultyView
+from Views.text_board_view import TextBoardView
 
 if __name__=="__main__":
     difficulty = DifficultyView()
@@ -27,7 +28,13 @@ if __name__=="__main__":
         treasures = 1
     
     board = BoardModel(rows, cols, mines)
-    view = BoardView(board)
+    # view = BoardView(board)  # Graphical view
+    view = TextBoardView(board)  # Text-based view
     controller = GameController(board, view)
     view.controller = controller
-    view.window.mainloop()
+
+    if isinstance(view, TextBoardView):
+        while not controller.game_over:
+            view.promptMove()
+    else: 
+        view.window.mainloop()
