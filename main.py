@@ -1,12 +1,31 @@
 from Models.board_model import BoardModel
 from Controllers.game_controller import GameController
 from Views.board_view import BoardView
+from Views.difficulty_view import DifficultyView
 
 if __name__=="__main__":
-    rows = 10
-    cols = 10
-    mines = 10
-
+    difficulty = DifficultyView()
+    if difficulty.level == "beginner":
+        rows = 8
+        cols = 8
+        mines = 10
+        treasures = 1
+    elif difficulty.level == "intermediate":
+        rows = 16
+        cols = 16
+        mines = 40
+        treasures = 3
+    elif difficulty.level == "expert":
+        rows = 30
+        cols = 16
+        mines = 99
+        treasures = 5
+    else:
+        rows = 8
+        cols = 8
+        mines = 10
+        treasures = 1
+    
     board = BoardModel(rows, cols, mines)
     view = BoardView(board)
     controller = GameController(board, view)

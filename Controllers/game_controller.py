@@ -1,6 +1,16 @@
 # Controls the game logic and updates the view
+import sys
+import os
+# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from datetime import datetime
 from tkinter import messagebox
+
+from Models.board_model import BoardModel
+from Views.board_view import BoardView
+from Views.difficulty_view import DifficultyView
+# from Models.board_model import BoardModel
+# from Views.board_view import BoardView
+# from Views.difficulty_view import DifficultyView
 
 class GameController:
     def __init__(self, board, view):
@@ -34,6 +44,12 @@ class GameController:
             cell.reveal()
             self.view.updateCell(x, y)
             self.gameOver(False)
+            return
+        
+        if cell.is_treasure:
+            cell.reveal()
+            self.view.updateCell(x, y)
+            self.gameOver(True)
             return
 
         if cell.adjacent_mines == 0:
@@ -79,6 +95,8 @@ class GameController:
         for x in range(self.board.rows):
             for y in range(self.board.cols):
                 cell = self.board.grid[x][y]
+                if cell.is_treasure:
+                    cell.reveal()
                 if cell.is_mine and not cell.is_flagged:
                     cell.reveal()
                 if cell.is_flagged and not cell.is_mine:
@@ -94,6 +112,39 @@ class GameController:
 
     # Restarts the game
     def restart(self):
+        # self.view.frame.destroy()
+        # self.view = None
+        # self.board = None
+
+        # difficulty = DifficultyView()
+        # if difficulty.level == "beginner":
+        #     rows = 8
+        #     cols = 8
+        #     mines = 10
+        #     treasures = 1
+        # elif difficulty.level == "intermediate":
+        #     rows = 16
+        #     cols = 16
+        #     mines = 40
+        #     treasures = 3
+        # elif difficulty.level == "expert":
+        #     rows = 30
+        #     cols = 16
+        #     mines = 99
+        #     treasures = 5
+        # else:
+        #     rows = 8
+        #     cols = 8
+        #     mines = 10
+        #     treasures = 1
+        
+        # board = BoardModel(rows, cols, mines)
+        # view = BoardView(board)
+        # self.board = board
+        # self.view = view
+        # view.controller = self
+        # view.window.mainloop()
+
         self.game_over = False
         self.start_time = None
         self.correct_flag_count = 0
@@ -117,3 +168,32 @@ class GameController:
         else:
             delta = datetime.now() - self.start_time
             return str(delta).split('.')[0]
+    
+    # def main():
+    #     difficulty = DifficultyView()
+    #     if difficulty.level == "beginner":
+    #         rows = 8
+    #         cols = 8
+    #         mines = 10
+    #         treasures = 1
+    #     elif difficulty.level == "intermediate":
+    #         rows = 16
+    #         cols = 16
+    #         mines = 40
+    #         treasures = 3
+    #     elif difficulty.level == "expert":
+    #         rows = 30
+    #         cols = 16
+    #         mines = 99
+    #         treasures = 5
+    #     else:
+    #         rows = 8
+    #         cols = 8
+    #         mines = 10
+    #         treasures = 1
+        
+    #     board = BoardModel(rows, cols, mines)
+    #     view = BoardView(board)
+    #     controller = GameController(board, view)
+    #     view.controller = controller
+    #     view.window.mainloop()
