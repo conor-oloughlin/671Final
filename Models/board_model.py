@@ -5,7 +5,7 @@ from Models.cell_model import Cell
 
 class BoardModel:
     # Sets the initial board parameters
-    def __init__(self, rows=8, cols=8, mines=10, treasures=1):
+    def __init__(self, rows=8, cols=8, mines=10, treasures=1, mine_positions=None, treasure_positions=None):
         self.rows = rows
         self.cols = cols
         self.mines = mines
@@ -22,21 +22,24 @@ class BoardModel:
         self.startTime = None
         self.grid = [[Cell() for _ in range(self.cols)] for _ in range(self.rows)]
 
-        # Creates the mine positions
-        self.mine_positions = random.sample(
-            [(x, y) for x in range(self.rows) for y in range(self.cols)], self.mines
-        )
+        if not any(cell.is_mine for row in self.grid for cell in row):
+            if not self.mine_positions:
+                # Creates the mine positions if positions aren't know
+                self.mine_positions = random.sample(
+                    [(x, y) for x in range(self.rows) for y in range(self.cols)], self.mines
+                )
+            # Sets is_mine property to true for each mine position
+            for x, y in self.mine_positions:
+                self.grid[x][y].is_mine = True
 
-        self.treasure_positions = random.sample(
-            [(x, y) for x in range(self.rows) for y in range(self.cols) if (x, y) not in self.mine_positions], self.treasures
-        )
-
-        # Sets is_mine property to true for each mine position
-        for x, y in self.mine_positions:
-            self.grid[x][y].is_mine = True
-        
-        for x, y in self.treasure_positions:
-            self.grid[x][y].is_treasure = True
+        if not any(cell.is_treasure for row in self.grid for cell in row):
+            if not self.treasure_positions:
+                # Creates the treasure positions if positions aren't know
+                self.treasure_positions = random.sample(
+                    [(x, y) for x in range(self.rows) for y in range(self.cols) if (x, y) not in self.mine_positions], self.treasures
+                )
+            for x, y in self.treasure_positions:
+                self.grid[x][y].is_treasure = True
         
         # Determines adjacent mines for each cell
         for x in range(self.rows):
