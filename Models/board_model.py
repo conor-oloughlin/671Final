@@ -21,24 +21,24 @@ class BoardModel:
         self.clickedCount = 0
         self.startTime = None
 
-        if not self.mine_positions:
-            # Creates the mine positions if positions aren't know
-            self.mine_positions = random.sample(
-                [(x, y) for x in range(self.rows) for y in range(self.cols)], self.mines
-            )
+        if not any(cell.is_mine for row in self.grid for cell in row):
+            if not self.mine_positions:
+                # Creates the mine positions if positions aren't know
+                self.mine_positions = random.sample(
+                    [(x, y) for x in range(self.rows) for y in range(self.cols)], self.mines
+                )
+            # Sets is_mine property to true for each mine position
+            for x, y in self.mine_positions:
+                self.grid[x][y].is_mine = True
 
-        if not self.treasure_positions:
-            # Creates the treasure positions if positions aren't know
-            self.treasure_positions = random.sample(
-                [(x, y) for x in range(self.rows) for y in range(self.cols) if (x, y) not in self.mine_positions], self.treasures
-            )
-
-        # Sets is_mine property to true for each mine position
-        for x, y in self.mine_positions:
-            self.grid[x][y].is_mine = True
-        
-        for x, y in self.treasure_positions:
-            self.grid[x][y].is_treasure = True
+        if not any(cell.is_treasure for row in self.grid for cell in row):
+            if not self.treasure_positions:
+                # Creates the treasure positions if positions aren't know
+                self.treasure_positions = random.sample(
+                    [(x, y) for x in range(self.rows) for y in range(self.cols) if (x, y) not in self.mine_positions], self.treasures
+                )
+            for x, y in self.treasure_positions:
+                self.grid[x][y].is_treasure = True
         
         # Determines adjacent mines for each cell
         for x in range(self.rows):
