@@ -4,6 +4,7 @@ from Views.board_view import BoardView
 from Views.difficulty_view import DifficultyView
 from Views.text_board_view import TextBoardView
 from Views.testing_view import TestingView
+from Views.mode_view import ModeView
 from Controllers.test_controller import TestController
 
 # def wait_for_file_path():
@@ -17,7 +18,7 @@ from Controllers.test_controller import TestController
 #         wait_for_file_path()
 
 if __name__=="__main__":
-    is_waiting = False
+    mode = ModeView()
     testing = TestingView()
     if testing.is_testing:
         file_path = testing.uploadCSV()
@@ -34,8 +35,10 @@ if __name__=="__main__":
         board = test_controller.game_board
     else:
         board = BoardModel(rows, cols, mines)
-    view = BoardView(board)  # Graphical view
-    # view = TextBoardView(board)  # Text-based view
+    if mode.mode == "graphical":
+        view = BoardView(board)
+    elif mode.mode == "text":
+        view = TextBoardView(board)
     controller = GameController(board, view)
     view.controller = controller
 

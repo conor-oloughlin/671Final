@@ -3,7 +3,7 @@ import tkinter as tk
 
 class DifficultyView:
     def __init__(self):
-        self.level = None  # Store the selected difficulty level
+        self.level = None
         self.rows = 8
         self.cols = 8
         self.mines = 10
