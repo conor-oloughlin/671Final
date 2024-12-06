@@ -4,9 +4,8 @@ from Views.board_view import BoardView
 from Views.difficulty_view import DifficultyView
 from Views.text_board_view import TextBoardView
 from Views.testing_view import TestingView
+from Views.mode_view import ModeView
 from Controllers.test_controller import TestController
-import time
-import threading
 
 # def wait_for_file_path():
 #     if not(is_waiting):
@@ -19,7 +18,7 @@ import threading
 #         wait_for_file_path()
 
 if __name__=="__main__":
-    is_waiting = False
+    mode = ModeView()
     testing = TestingView()
     if testing.is_testing:
         file_path = testing.uploadCSV()
@@ -27,33 +26,19 @@ if __name__=="__main__":
 
     else:
         difficulty = DifficultyView()
-        if difficulty.level == "beginner":
-            rows = 8
-            cols = 8
-            mines = 10
-            treasures = 1
-        elif difficulty.level == "intermediate":
-            rows = 16
-            cols = 16
-            mines = 40
-            treasures = 3
-        elif difficulty.level == "expert":
-            rows = 30
-            cols = 16
-            mines = 99
-            treasures = 5
-        else:
-            rows = 8
-            cols = 8
-            mines = 10
-            treasures = 1
+        rows = difficulty.rows
+        cols = difficulty.cols
+        mines = difficulty.mines
+        treasures = difficulty.treasures
     
     if testing.is_testing:
         board = test_controller.game_board
     else:
         board = BoardModel(rows, cols, mines)
-    view = BoardView(board)  # Graphical view
-    # view = TextBoardView(board)  # Text-based view
+    if mode.mode == "graphical":
+        view = BoardView(board)
+    elif mode.mode == "text":
+        view = TextBoardView(board)
     controller = GameController(board, view)
     view.controller = controller
 

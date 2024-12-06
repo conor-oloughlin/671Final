@@ -23,4 +23,3 @@ class TestingView:
             messagebox.showerror("Invalid Board", "The test board is not valid.")
         # Destroys the tkinter window
         temp_root.destroy()
-        self.has_path = True

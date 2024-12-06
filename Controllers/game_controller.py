@@ -52,7 +52,7 @@ class GameController:
         
         if cell.is_treasure:
             cell.reveal()
-            self.view.updateCell(x, y)
+            self.view.updateView(x, y)
             self.gameOver(True)
             return
 
@@ -66,6 +66,14 @@ class GameController:
 
         if self.clicked_count == (self.board.rows * self.board.cols) - self.board.mines:
             self.gameOver(True)
+
+    # Refreshes the view based on type
+    def updateView(self, x=None, y=None):
+        if isinstance(self.view, BoardView):
+            if x is not None and y is not None:
+                self.view.updateCell(x,y)
+            elif isinstance(self.view, TextBoardView):
+                self.view.refresh()
 
     # Helper to update game board based off of view type
     def refreshView(self):

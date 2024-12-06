@@ -10,31 +10,45 @@ from Views.board_view import BoardView
 
 from Models.board_model import BoardModel
 from Views.board_view import BoardView
+from Models.cell_model import Cell
 
 class TestController: 
     def __init__(self, file_path):
         self.file_path = file_path
-        self.file_contents = self.read_board(self.file_path)
         self.game_board = BoardModel()
+        self.file_contents = self.read_board(self.file_path)
+        if self.game_board:
+            self.validate_board(self.game_board.grid)
 
 
     def read_board(self, file_path):
         with open(file_path, mode="r") as file:
             reader = csv.reader(file)
             tmp = [[int(cell) for cell in row] for row in reader]
-            self.game_board.rows = tmp.__len__
-            self.game_board.cols = tmp[0].__len__
-            return tmp
+
+            # Set rows and cols based on the CSV
+            self.game_board.rows = len(tmp)
+            self.game_board.cols = len(tmp[0])
+
+            # Assign the data to the board's grid
+            self.game_board.grid = [
+                [Cell(is_mine=(cell == 1), is_treasure=(cell == 2)) for cell in row] for row in tmp
+            ]
+        return tmp
 
     def validate_board(self, board):
         # Check board size
         if len(board) != 8 or any(len(row) != 8 for row in board):
             return False
 
+        valid_values={0,1,2}
+        if any(cell not in valid_values for row in board for cell in row):
+            return False
+
         self.game_board.mines_positions = [(r, c) for r, row in enumerate(board) for c, cell in enumerate(row) if cell == 1]
         self.game_board.treasures_positions = [(r, c) for r, row in enumerate(board) for c, cell in enumerate(row) if cell == 2]
-        self.game_board.mines = self.game_board.mines_positions.__len__
-        self.game_board.treasures = self.game_board.treasures_positions.__len__
+        self.game_board.mines = len(self.game_board.mines_positions)
+        self.game_board.treasures = len(self.game_board.treasures_positions)
 
         # Validate mine locations and treasures
         if len(self.game_board.mines) != 10:

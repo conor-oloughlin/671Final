@@ -28,9 +28,13 @@ class TextBoardView:
             return "#"
 
     def promptMove(self):
-        move = input("Enter your move (e.g., 'R 1 2' for reveal or 'F 1 2' for flag): ").strip().split()
-        if len(move) == 3:
-            action, x, y = move[0].upper(), move[1], move[2]
+        move = input("Enter your move (e.g., 'R 1 2' for reveal or 'F 1 2' for flag): ").strip()
+        if move == "exit":
+            print("Thanks for playing! Exiting the game...")
+            exit()
+        parts = move.split()
+        if len(parts) == 3:
+            action, x, y = parts[0].upper(), parts[1], parts[2]
             try:
                 x, y = int(x), int(y)
                 if action == "R":
