@@ -46,11 +46,14 @@ class GameController:
             return
 
         if cell.is_mine:
+            print("mine")
             cell.reveal()
+            self.view.updateCell(x, y)
             self.gameOver(False)
             return
         
         if cell.is_treasure:
+            print("treasure")
             cell.reveal()
             self.view.updateCell(x, y)
             self.gameOver(True)
@@ -69,6 +72,9 @@ class GameController:
 
     # Helper to update game board based off of view type
     def refreshView(self):
+        if not self.view.window.winfo_exists():
+            return
+
         if isinstance(self.view, BoardView):
             # Update the view for all revealed cells
             for i in range(self.board.rows):
@@ -98,6 +104,7 @@ class GameController:
             if cell.is_mine:
                 self.correct_flag_count -= 1
 
+        self.view.updateCell(x, y)
         self.refreshView()
         if isinstance(self.view, TextBoardView):
             print(f"Mines: {self.board.mines - self.flag_count}, Time: {self.getTimeElapsed()}")
@@ -106,6 +113,9 @@ class GameController:
 
     def gameOver(self, won):
         self.game_over = True
+
+        if hasattr(self, "timer_id"):
+            self.view.window.after_cancel(self.timer_id)
 
         # Reveal all cells
         for x in range(self.board.rows):
@@ -118,9 +128,11 @@ class GameController:
                 if cell.is_flagged and not cell.is_mine:
                     # Mark wrong flags
                     cell.is_wrong_flag = True
+                    cell.reveal()
 
-        # Refresh the view once after processing all cells
-        self.refreshView()
+        # Refresh the view after revealing all cells
+        if self.view.window.winfo_exists():
+            self.refreshView()
 
         # Display game over message
         if isinstance(self.view, TextBoardView):
@@ -133,47 +145,24 @@ class GameController:
                 print("Thanks for playing!")
                 exit()
         elif isinstance(self.view, BoardView):
-            # For graphical view
-            message = "You Win! Play again?" if won else "You Lose! Play again?"
-            if messagebox.askyesno("Game Over", message):
-                self.restart()
-            else:
-                self.view.window.quit()
+            def showGameOver():
+                if self.view.window.winfo_exists():
+                    # For graphical view
+                    message = "You Win! Play again?" if won else "You Lose! Play again?"
+                    print("asking message")
+                    if messagebox.askyesno("Game Over", message):
+                        print("restarting")
+                        self.restart()
+                    else:
+                        print("destroying")
+                        self.view.window.destroy()
+            print("waiting")
+            self.view.window.after(1000, showGameOver)
 
     # Restarts the game
     def restart(self):
-        # self.view.frame.destroy()
-        # self.view = None
-        # self.board = None
-
-        # difficulty = DifficultyView()
-        # if difficulty.level == "beginner":
-        #     rows = 8
-        #     cols = 8
-        #     mines = 10
-        #     treasures = 1
-        # elif difficulty.level == "intermediate":
-        #     rows = 16
-        #     cols = 16
-        #     mines = 40
-        #     treasures = 3
-        # elif difficulty.level == "expert":
-        #     rows = 30
-        #     cols = 16
-        #     mines = 99
-        #     treasures = 5
-        # else:
-        #     rows = 8
-        #     cols = 8
-        #     mines = 10
-        #     treasures = 1
-        
-        # board = BoardModel(rows, cols, mines)
-        # view = BoardView(board)
-        # self.board = board
-        # self.view = view
-        # view.controller = self
-        # view.window.mainloop()
+        if hasattr(self, 'timer_id'):
+            self.view.window.after_cancel(self.timer_id)
 
         self.game_over = False
         self.start_time = None
@@ -181,16 +170,20 @@ class GameController:
         self.flag_count = 0
         self.clicked_count = 0
         self.board.setup()
-        # self.view.resetUI()
-        # Refresh the appropriate view
         if isinstance(self.view, BoardView):
+            for widget in self.view.window.winfo_children():
+                widget.destroy()
+            
             self.view.generateUI()
+            # self.view.frame.destroy()
+            # self.view = BoardView(self.board, self)
+            # self.view.generateUI()
         elif isinstance(self.view, TextBoardView):
             self.view.displayBoard()
         self.updateTimer()
 
     def updateTimer(self):
-        if self.game_over:
+        if self.game_over or not self.view.window.winfo_exists():
             return
 
         elapsed_time = self.getTimeElapsed()
@@ -198,7 +191,7 @@ class GameController:
         if isinstance(self.view, BoardView):
             # For graphical view, update the status label and re-schedule the timer
             self.view.refreshLabel(self.board.mines - self.flag_count, elapsed_time)
-            self.view.window.after(1000, self.updateTimer)
+            self.timer_id = self.view.window.after(1000, self.updateTimer)
         elif isinstance(self.view, TextBoardView):
             # For text-based view, print the elapsed time directly
             print(f"Time: {elapsed_time}")

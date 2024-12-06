@@ -13,8 +13,6 @@ class Cell:
     def reveal(self):
         if not self.is_flagged:
             self.is_revealed = True
-            return self.is_mine
-        return None
     
     # Toggles the flag parameters of a cell.
     def toggle_flag(self):

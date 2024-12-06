@@ -1,5 +1,6 @@
 # View for initial dialogue box to select difficulty
-from tkinter import simpledialog
+from tkinter import filedialog, simpledialog
+import tkinter as tk
 
 class DifficultyView:
     def __init__(self):

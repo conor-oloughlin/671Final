@@ -14,8 +14,7 @@ class BoardView:
 
         self.window = tk.Tk()
         self.window.title("Minesweeper")
-        self.frame = tk.Frame(self.window)
-        self.frame.pack()
+        self.frame = None
 
         self.tiles = {}
         self.status_label = None
@@ -23,6 +22,7 @@ class BoardView:
             "plain": PhotoImage(file = "images/tile_plain.gif"),
             "clicked": PhotoImage(file = "images/tile_clicked.gif"),
             "mine": PhotoImage(file = "images/tile_mine.gif"),
+            "treasure": PhotoImage(file = "images/tile_treasure.gif"),
             "flag": PhotoImage(file = "images/tile_flag.gif"),
             "wrong": PhotoImage(file = "images/tile_wrong.gif"),
             "numbers": [PhotoImage(file = f"images/tile_{i}.gif") for i in range(1, 9)]
@@ -30,6 +30,12 @@ class BoardView:
         #self.generateUI()
     
     def generateUI(self):
+        if hasattr(self, "frame") and self.frame is not None and self.frame.winfo_exists():
+            self.frame.destroy()
+        
+        self.frame = tk.Frame(self.window)
+        self.frame.pack()
+     
         # Generates tiles for the game board
         for x in range(self.board.rows):
             self.tiles[x] = {}
@@ -46,6 +52,9 @@ class BoardView:
         self.status_label.grid(row=self.board.rows + 1, column=0, columnspan=self.board.cols)
 
     def updateCell(self, x, y):
+        if not self.window.winfo_exists():
+            return
+
         cell = self.board.grid[x][y]
         button = self.tiles[x][y]
 
@@ -53,7 +62,7 @@ class BoardView:
             if cell.is_mine:
                 button.config(image=self.images["mine"])
             elif cell.is_treasure:
-                button.config(image=self.images["mine"])
+                button.config(image=self.images["treasure"])
             elif cell.adjacent_mines > 0:
                 button.config(image=self.images["numbers"][cell.adjacent_mines - 1])
             else:
@@ -64,18 +73,16 @@ class BoardView:
             button.config(image=self.images["plain"])
     
     # Updates elements of the game status including the remaining mines and time elapsed
-    def refreshLabel(self, reminaing_mines, time_elapsed):
-        self.status_label.config(text=f"Mines: {self.board.mines} Time: {time_elapsed}")
+    def refreshLabel(self, remaining_mines, time_elapsed):
+        if self.window.winfo_exists() and self.status_label.winfo_exists():
+            self.status_label.config(text=f"Mines: {remaining_mines} Time: {time_elapsed}")
     
     # Wrapper for the onClick function that handles left clicks
     def onClickWrapper(self, x, y):
-        def hanlder(event):
-            self.controller.onClick(x, y)
-        return hanlder
+        return lambda event: self.controller.onClick(x, y)
+        
     
     # Wrapper for the onRightClick function that handles right clicks
     def onRightClickWrapper(self, x, y):
-        def handler(event):
-            self.controller.onRightClick(x, y)
-        return handler
+        return lambda event: self.controller.onRightClick(x, y)
 

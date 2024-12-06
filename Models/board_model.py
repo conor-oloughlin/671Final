@@ -20,6 +20,7 @@ class BoardModel:
         self.correctFlagCount = 0
         self.clickedCount = 0
         self.startTime = None
+        self.grid = [[Cell() for _ in range(self.cols)] for _ in range(self.rows)]
 
         # Creates the mine positions
         self.mine_positions = random.sample(
@@ -63,6 +64,9 @@ class BoardModel:
         while queue:
             currX, currY = queue.popleft()
             for neighborX, neighborY in self.getNeighbors(currX, currY):
+                if neighborX < 0 or neighborX >= self.rows or neighborY < 0 or neighborY >= self.cols:
+                    continue
+                
                 cell = self.grid[neighborX][neighborY]
                 
                 if not cell.is_revealed and not cell.is_flagged:
