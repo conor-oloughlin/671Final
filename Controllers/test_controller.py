@@ -79,7 +79,6 @@ class TestController:
                     if cell not in valid_values:
                         print(f"Invalid cell value: {cell}")
             return False
-
         self.game_board.mine_positions = [(r, c) for r, row in enumerate(self.file_contents) for c, cell in enumerate(row) if cell == 1]
         self.game_board.treasure_positions = [(r, c) for r, row in enumerate(self.file_contents) for c, cell in enumerate(row) if cell == 2]
         self.game_board.mines = len(self.game_board.mine_positions)

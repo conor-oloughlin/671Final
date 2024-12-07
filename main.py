@@ -63,8 +63,6 @@ if __name__=="__main__":
         view = BoardView(board, root)
         controller = GameController(board, view)
         root.mainloop()
-        root.wait_window(view.window)
-        root.destroy()
     elif mode_view.mode == "text":
         view = TextBoardView(board)
         controller = GameController(board, view)
