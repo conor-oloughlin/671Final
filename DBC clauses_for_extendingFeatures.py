@@ -22,11 +22,11 @@ window = None
 class Minesweeper:
 
     # DBC: Preconditions:
-    #   - tk  is a valid Tk instance.
+    #   - tk: isinstance(tk, Tk)
     # Postconditions:
-    #   - Initializes self.images with required image
-    #   - Initial game frame is created and packed.
-    #   - Calls restart() and updateTimer() to start the game.
+    #   - self.images: Initializes with required image
+    #   - self.frame: Initial game frame is created and packed
+    #   - Calls restart() and updateTimer() to start the game
     def init(self, tk):
 
         # import images
@@ -50,11 +50,11 @@ class Minesweeper:
         self.updateTimer()  # init timer
 
     # DBC: Preconditions:
-    #   - self.size_x, self.size_y, self.num_mines, self.num_treasures are defined.
+    #   - hasattr(self.size_x, self.size_y, self.num_mines, self.num_treasures)
     # Postconditions:
-    #   - Fills self.tiles with tile data structures.
-    #   - tile button is created and assigned in the grid.
-    #   - Rrandomly assigns mine_coords and treasure_coords.
+    #   - self.tiles: Populated with tile data structures
+    #   - tile button: Created and assigned in the grid
+    #   - "mine_coords" and "treasure_coords" randomaly assigned
     def setup(self):
         # create flag and clicked tile variables
         self.flagCount = 0
@@ -107,13 +107,13 @@ class Minesweeper:
                 self.tiles[x][y]["mines"] = mc
 
     # DBC: Preconditions:
-    #   - Minesweeper object is properly initialized with Tk instance.
+    #   - isinstance(self.tk, Tk)
     # Postconditions:
-    #   - Existing frame destroyed.  
-    #   - A new frame created.
-    #   - Prompts the user to select a difficulty level ("beginner", "intermediate", "expert").
-    #   - Set up the size_x, size_y, num_mines, and num_treasures according to the selected difficulty level.
-    #   - UI labels are refreshed.
+    #   - self.frame.destroy(): Existing frame destroyed  
+    #   - self.frame: A new frame created
+    #   - simpledialog: Prompts the user to select a difficulty level ("beginner", "intermediate", "expert")
+    #   - self.setup(): Sets the size_x, size_y, num_mines, and num_treasures according to the selected difficulty level
+    #   - self.refreshLabels(): UI labels are refreshed
     def restart(self):
         # destroy existing frame
         self.frame.destroy()
@@ -159,20 +159,21 @@ class Minesweeper:
         self.refreshLabels()
 
     # DBC: Preconditions:
-    #   - self.flagCount be an integer.
-    #   - self.num_mines be an integer.
+    #   - isinstance(self.flagCount, int)
+    #   - isinstance(self.num_mines, int)
     # Postconditions:
-    #   - The "flags" and "mines" lable is updated to show the current "self.flagCount" and "self.num_mines".
+    #   - UI labels for "flags" and "mines" updated to display the current "self.flagCount" and "self.num_mines"
     def refreshLabels(self):
         self.labels["flags"].config(text="Flags: " + str(self.flagCount))
         self.labels["mines"].config(text="Mines: " + str(self.num_mines))
 
     # DBC: Preconditions:
-    #   - "won" a boolean expression, indicates whether the player won or lost.
+    #   - isinstance(won, bool)
     # Postconditions:
-    #   - All tiles are visible ("mines", "treasures", and "incorrect flags").
-    #   - Appears a message box asking, the user wants to play again or not.
-    #   - If the user selects "yes", the game restarts again; if "no", the application closes.
+    #   - All tiles are visible ("mines", "treasures", and "incorrect flags")
+    #   - msg: Message box prompt user to play again or not
+    #   - self.restart(): Selects "yes", the game restarts 
+    #   - self.tk.quit(): Selects "no", the application closes
     def gameOver(self, won):
         for x in range(0, self.size_x):
             for y in range(0, self.size_y):
@@ -194,10 +195,10 @@ class Minesweeper:
             self.tk.quit()
 
     # DBC: Preconditions:
-    #   - self.startTime may be "None", if game not started.
+    #   - isinstance(self.startTime, type(None))
     # Postconditions:
-    #   - self.updateTimer to updated time label after every 100 ms.
-    #   - If game is on, shows the time elapsed since self.startTime.
+    #   - self.updateTimer:  Updated time label after every 100 ms
+    #   - self.startTime: Shows the time elapsed since game started
     def updateTimer(self):
         ts = "00:00:00"
         if self.startTime != None:
@@ -209,10 +210,11 @@ class Minesweeper:
         self.frame.after(100, self.updateTimer)
 
     # DBC: Preconditions:
-    #   - x, y are valid indexes within the game board.
+    #   - 0 <= x < self.size_x
+    #   - 0 <= y < self.size_y
     # Postconditions:
-    #   - Returns a list of neighbor tiles around (x, y).
-    #   - Excludes, if the tiles is out of range.
+    #   - Returns a list of neighbor tiles around (x, y)
+    #   - Excludes, out of range tiles
     def getNeighbors(self, x, y):
         neighbors = []
         coords = [
@@ -233,28 +235,31 @@ class Minesweeper:
         return neighbors
 
     # DBC: Preconditions:
-    #   - x, y are valid tile coordinate within the game board.
+    #   - 0 <= x < self.size_x
+    #   - 0 <= y < self.size_y
     # Postconditions:
-    #   - Returns a lambda function that calls "onClick" with a valid (x, y).
+    #   - Returns a lambda function that calls "self.onClick" with valid (x, y)
     def onClickWrapper(self, x, y):
         return lambda Button: self.onClick(self.tiles[x][y])
 
     # DBC: Preconditions:
-    #   - x, y are valid tile coordinate within the game board.
+    #   - 0 <= x < self.size_x
+    #   - 0 <= y < self.size_y
     # Postconditions:
-    #   - Returns a lambda function that calls "onRightClick" with a valid (x, y).
+    #   - Returns a lambda function that calls "self.onRightClick" with valid (x, y)
     def onRightClickWrapper(self, x, y):
         return lambda Button: self.onRightClick(self.tiles[x][y])
 
     # DBC: Preconditions:
-    #   - x, y are valid tile dictionary with keys {"isMine", "isTreasure", "mines"}.
-    #   - game.state is RUNNING.
+    #   - isinstance(tile, dict)
+    #   - tile, keys {"isMine", "isTreasure", "mines"}
+    #   - Game is RUNNING
     # Postconditions:
-    #   - If tile.isTreasure == True, call gameOver(True).
-    #   - If tile.isMine == True, call gameOver(False).
-    #   - If tile.mines == 0, clear surrounding tiles.
-    #   - Otherwise, set tile as visible.
-    #   - If all safe tiles are clicked, call gameOver(True).
+    #   - If tile.isTreasure == True, call gameOver(True)
+    #   - If tile.isMine == True, call gameOver(False)
+    #   - If tile.mines == 0, clear surrounding tiles
+    #   - Otherwise, set tile as visible
+    #   - If all safe tiles are clicked, call gameOver(True)
     def onClick(self, tile):
         if self.startTime == None:
             self.startTime = datetime.now()
@@ -281,8 +286,9 @@ class Minesweeper:
             self.gameOver(True)
 
     # DBC: Preconditions:
-    #   - tile is a dictionary with keys {isMine, isTreasure, mines}.
-    #   - game.state is RUNNING.
+    #   - isinstance(tile, dict)
+    #   - tile, keys {"isMine", "isTreasure", "mines"}
+    #   - Game is running
     # Postconditions:
     #   - If tile.state == DEFAULT, set FLAGGED, increment flagCount, adjust correctFlagCount.
     #   - If tile.state == FLAGGED, set DEFAULT, decrement flagCount, adjust correctFlagCount.
@@ -326,12 +332,13 @@ class Minesweeper:
                 self.clearTile(tile, queue)
 
     # DBC: Preconditions:
-    #   - tile is a dictionary with keys {id, state, mines}.
-    #   - queue is a deque used by clearSurroundingTiles.
+    #   - isinstance(tile, dict)
+    #   - tile, keys {"id", "state", "mines"}
+    #   - isinstance(queue, deque)
     # Postconditions:
-    #   - If tile.state == DEFAULT and tile.mines == 0, set visible, add to queue.
-    #   - If tile.state == DEFAULT and tile.mines > 0, set visible.
-    #   - Increment clickedCount for state change to CLICKED.
+    #   - (tile.state == DEFAULT & tile.mines == 0), set visible, add to queue
+    #   - (tile.state == DEFAULT & tile.mines > 0), set visible
+    #   - Increment self.clickedCount +=1 for state change to CLICKED
     def clearTile(self, tile, queue):
         if tile["state"] != STATE_DEFAULT:
             return
@@ -350,9 +357,9 @@ class Minesweeper:
 # DBC: Preconditions:
 #   - None.
 # Postconditions:
-#   - Creates a Tk root window.
-#   - Initializes Minesweeper object.
-#   - Runs the GUI main loop.
+#   - Tk(): Creates a Tk root window
+#   - Initializes Minesweeper object
+#   - window.mainloop(): Runs the GUI main loop
 def main():
     # create Tk instance
     window = Tk()
