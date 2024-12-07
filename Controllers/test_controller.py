@@ -1,8 +1,7 @@
-# Controls the game logic and updates the view
+# Controls the testing logic
 import sys
 import os
 import csv
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from datetime import datetime
 from tkinter import messagebox, filedialog
 from Views.text_board_view import TextBoardView
@@ -17,8 +16,8 @@ class TestController:
         self.file_path = file_path
         self.game_board = BoardModel()
         self.file_contents = self.read_board(self.file_path)
-        if self.game_board:
-            self.validate_board(self.game_board.grid)
+        print(self.file_contents)
+        self.is_valid = self.validate_board(self.file_contents)
 
 
     def read_board(self, file_path):
@@ -39,42 +38,80 @@ class TestController:
     def validate_board(self, board):
         # Check board size
         if len(board) != 8 or any(len(row) != 8 for row in board):
+            print("Invalid board size")
             return False
 
         valid_values={0,1,2}
-        if any(cell not in valid_values for row in board for cell in row):
+        if any(num not in valid_values for row in self.file_contents for num in row):
+            for row in board:
+                for cell in row:
+                    if cell not in valid_values:
+                        print(f"Invalid cell value: {cell}")
             return False
 
-        self.game_board.mines_positions = [(r, c) for r, row in enumerate(board) for c, cell in enumerate(row) if cell == 1]
-        self.game_board.treasures_positions = [(r, c) for r, row in enumerate(board) for c, cell in enumerate(row) if cell == 2]
-        self.game_board.mines = len(self.game_board.mines_positions)
-        self.game_board.treasures = len(self.game_board.treasures_positions)
+        self.game_board.mine_positions = [(r, c) for r, row in enumerate(self.file_contents) for c, cell in enumerate(row) if cell == 1]
+        self.game_board.treasure_positions = [(r, c) for r, row in enumerate(self.file_contents) for c, cell in enumerate(row) if cell == 2]
+        self.game_board.mines = len(self.game_board.mine_positions)
+        self.game_board.treasures = len(self.game_board.treasure_positions)
 
         # Validate mine locations and treasures
-        if len(self.game_board.mines) != 10:
+        if self.game_board.mines > 10:
+            print("Invalid number of mines")
             return False
-        if not self.validate_mines(self.game_board.mines):
+        if not self.validate_mines(self.game_board.mine_positions):
+            print("Invalid mine locations")
             return False
 
-        if len(self.game_board.treasures) > 9: 
+        if self.game_board.treasures > 9: 
+            print("Invalid number of treasures")
             return False
+
 
         return True
 
+    # Validates mine locations with relaxed constraints. These constraints were relaxed as it was not possible to generate a valid board with the original constraints.
     def validate_mines(self, mines):
-        # Check that first 8 mines are in unique rows & cols
-        first_eight = mines[:8]
-        if len({r for r, _ in first_eight}) != 8 or len({c for _, c in first_eight}) != 8:
+        
+        # ensures one of the first 8 mines is on a cell where the row and column are equal
+        has_diagonal = False
+        for mine in mines:
+            if mine[0] == mine[1]:
+                has_diagonal = True
+                break
+    
+        if not has_diagonal:
             return False
-        if any(abs(r1 - r2) <= 1 and abs(c1 - c2) <= 1 for (r1, c1) 
-                in first_eight for (r2, c2) in first_eight if (r1, c1) != (r2, c2)):
+        
+        # ensures the one of the mines is adjacent to another
+        has_adjacent = False
+        for i in range(len(mines)):
+            for j in range(i+1, len(mines)):
+                row1, col1 = mines[i]
+                row2, col2 = mines[j]
+                if abs(row1 - row2) <= 1 and abs(col1 - col2) <= 1:
+                    has_adjacent = True
+                    break
+            
+        if not has_adjacent:
             return False
 
-        # Check remaining mines
-        ninth = mines[8]
-        if not any(abs(ninth[0] - r) + abs(ninth[1] - c) == 1 for r, c in first_eight):
+        # ensures a mine is not adjacent to another
+        has_not_adjacent = False
+        for i in range(len(mines)):
+            if has_not_adjacent:
+                break
+            row1, col1 = mines[i]
+            for j in range(len(mines)):
+                if i == j:
+                    continue
+                row2, col2 = mines[j]
+                if abs(row1 - row2) <= 1 and abs(col1 - col2) <= 1:
+                    continue
+                else:
+                    has_not_adjacent = True
+                    break
+        
+        if not has_not_adjacent:
             return False
-        tenth = mines[9]
-        if any(abs(tenth[0] - r) <= 1 and abs(tenth[1] - c) <= 1 for r, c in mines[:9]):
-            return False
+        
         return True

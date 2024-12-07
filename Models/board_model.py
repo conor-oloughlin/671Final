@@ -10,8 +10,8 @@ class BoardModel:
         self.cols = cols
         self.mines = mines
         self.treasures = treasures
-        self.mine_positions = []
-        self.treasure_positions = []
+        self.mine_positions = mine_positions if mine_positions is not None else []
+        self.treasure_positions = treasure_positions if treasure_positions is not None else []
         self.grid = [[Cell() for _ in range(cols)] for _ in range(rows)]
     
     # Sets up the initial board state. A reengineered version of the setup function.
@@ -32,7 +32,6 @@ class BoardModel:
             for x, y in self.mine_positions:
                 self.grid[x][y].is_mine = True
 
-        if not any(cell.is_treasure for row in self.grid for cell in row):
             if not self.treasure_positions:
                 # Creates the treasure positions if positions aren't know
                 self.treasure_positions = random.sample(

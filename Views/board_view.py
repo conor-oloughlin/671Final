@@ -1,23 +1,31 @@
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import tkinter as tk
 from tkinter import *
 from Models.board_model import BoardModel
 
 class BoardView:
-    def __init__(self, board, controller=None):
+    def __init__(self, board, root, controller=None):
         # Defines controller and game board
         self.controller = controller
         self.board = board
 
-        self.window = tk.Tk()
+        self.window = tk.Toplevel(root)
         self.window.title("Minesweeper")
         self.frame = None
 
         self.tiles = {}
         self.status_label = None
+    
+    # Builds the graphical UI for the game
+    def generateUI(self):
+        if hasattr(self, "frame") and self.frame is not None and self.frame.winfo_exists():
+            self.frame.destroy()
+        
+        self.frame = tk.Frame(self.window)
+        self.frame.pack()
+
         self.images = {
             "plain": PhotoImage(file = "images/tile_plain.gif"),
             "clicked": PhotoImage(file = "images/tile_clicked.gif"),
@@ -27,14 +35,6 @@ class BoardView:
             "wrong": PhotoImage(file = "images/tile_wrong.gif"),
             "numbers": [PhotoImage(file = f"images/tile_{i}.gif") for i in range(1, 9)]
         }
-        #self.generateUI()
-    
-    def generateUI(self):
-        if hasattr(self, "frame") and self.frame is not None and self.frame.winfo_exists():
-            self.frame.destroy()
-        
-        self.frame = tk.Frame(self.window)
-        self.frame.pack()
      
         # Generates tiles for the game board
         for x in range(self.board.rows):
@@ -51,6 +51,7 @@ class BoardView:
         self.status_label = tk.Label(self.frame, text="Mines: {self.board.mines} Time: 0")
         self.status_label.grid(row=self.board.rows + 1, column=0, columnspan=self.board.cols)
 
+    # Updates cells according to their state
     def updateCell(self, x, y):
         if not self.window.winfo_exists():
             return

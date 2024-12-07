@@ -3,13 +3,13 @@ from tkinter import filedialog, simpledialog
 import tkinter as tk
 
 class DifficultyView:
-    def __init__(self):
+    def __init__(self, root):
         self.level = None
         self.rows = 8
         self.cols = 8
         self.mines = 10
         self.treasures = 1
-        self.window = tk.Tk()
+        self.window = tk.Toplevel(root)
         self.window.title("Select Difficulty")
 
         beginner_button = tk.Button(self.window, text="Beginner", command=lambda: self.set_difficulty("beginner"))
@@ -18,8 +18,6 @@ class DifficultyView:
         beginner_button.pack(pady=10)
         intermediate_button.pack(pady=10)
         expert_button.pack(pady=10)
-
-        self.window.mainloop()
 
     def set_difficulty(self, level):
         self.level = level

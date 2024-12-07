@@ -1,7 +1,6 @@
 # Controls the game logic and updates the view
 import sys
 import os
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from datetime import datetime
 from tkinter import messagebox
 from Views.text_board_view import TextBoardView
@@ -10,9 +9,6 @@ from Views.board_view import BoardView
 from Models.board_model import BoardModel
 from Views.board_view import BoardView
 from Views.difficulty_view import DifficultyView
-# from Models.board_model import BoardModel
-# from Views.board_view import BoardView
-# from Views.difficulty_view import DifficultyView
 
 class GameController:
     def __init__(self, board, view):
@@ -55,7 +51,7 @@ class GameController:
         if cell.is_treasure:
             print("treasure")
             cell.reveal()
-            self.view.updateView(x, y)
+            self.updateView(x, y)
             self.gameOver(True)
             return
 
@@ -75,8 +71,8 @@ class GameController:
         if isinstance(self.view, BoardView):
             if x is not None and y is not None:
                 self.view.updateCell(x,y)
-            elif isinstance(self.view, TextBoardView):
-                self.view.refresh()
+        elif isinstance(self.view, TextBoardView):
+            self.view.refresh()
 
     # Helper to update game board based off of view type
     def refreshView(self):
@@ -119,6 +115,7 @@ class GameController:
         else:
             self.view.refreshLabel(self.board.mines - self.flag_count, self.getTimeElapsed())
 
+    # Handles game over logic
     def gameOver(self, won):
         self.game_over = True
 
@@ -164,6 +161,7 @@ class GameController:
                     else:
                         print("destroying")
                         self.view.window.destroy()
+                        self.view.window.master.destroy()
             print("waiting")
             self.view.window.after(1000, showGameOver)
 
@@ -177,15 +175,13 @@ class GameController:
         self.correct_flag_count = 0
         self.flag_count = 0
         self.clicked_count = 0
-        self.board.setup()
+        if not any(cell.is_mine or cell.is_treasure for row in self.board.grid for cell in row):
+            self.board.setup()
         if isinstance(self.view, BoardView):
             for widget in self.view.window.winfo_children():
                 widget.destroy()
             
             self.view.generateUI()
-            # self.view.frame.destroy()
-            # self.view = BoardView(self.board, self)
-            # self.view.generateUI()
         elif isinstance(self.view, TextBoardView):
             self.view.displayBoard()
         self.updateTimer()
@@ -210,9 +206,3 @@ class GameController:
         else:
             delta = datetime.now() - self.start_time
             return str(delta).split('.')[0]
-        
-    def updateView(self):
-        if isinstance(self.view, TextBoardView):
-            self.view.refresh()  # Calls refresh to re-render the text-based view
-        elif isinstance(self.view, BoardView):
-            self.view.generateUI()  # Refreshes the graphical view
