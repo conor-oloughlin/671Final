@@ -14,7 +14,7 @@ from Models.cell_model import Cell
 class TestController: 
     def __init__(self, file_path):
         self.file_path = file_path
-        self.game_board = BoardModel()
+        self.game_board = BoardModel(is_testing=True)
         self.file_contents = self.read_board(self.file_path)
         print(self.file_contents)
         self.is_valid = self.validate_board(self.file_contents)

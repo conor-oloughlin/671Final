@@ -42,14 +42,12 @@ class GameController:
             return
 
         if cell.is_mine:
-            print("mine")
             cell.reveal()
-            self.view.updateCell(x, y)
+            self.updateView(x, y)
             self.gameOver(False)
             return
         
         if cell.is_treasure:
-            print("treasure")
             cell.reveal()
             self.updateView(x, y)
             self.gameOver(True)
@@ -76,9 +74,6 @@ class GameController:
 
     # Helper to update game board based off of view type
     def refreshView(self):
-        if not self.view.window.winfo_exists():
-            return
-
         if isinstance(self.view, BoardView):
             # Update the view for all revealed cells
             for i in range(self.board.rows):
@@ -136,8 +131,7 @@ class GameController:
                     cell.reveal()
 
         # Refresh the view after revealing all cells
-        if self.view.window.winfo_exists():
-            self.refreshView()
+        self.refreshView()
 
         # Display game over message
         if isinstance(self.view, TextBoardView):
@@ -154,15 +148,12 @@ class GameController:
                 if self.view.window.winfo_exists():
                     # For graphical view
                     message = "You Win! Play again?" if won else "You Lose! Play again?"
-                    print("asking message")
                     if messagebox.askyesno("Game Over", message):
-                        print("restarting")
                         self.restart()
                     else:
-                        print("destroying")
+                        print("Thanks for playing!")
                         self.view.window.destroy()
                         self.view.window.master.destroy()
-            print("waiting")
             self.view.window.after(1000, showGameOver)
 
     # Restarts the game
@@ -175,8 +166,7 @@ class GameController:
         self.correct_flag_count = 0
         self.flag_count = 0
         self.clicked_count = 0
-        if not any(cell.is_mine or cell.is_treasure for row in self.board.grid for cell in row):
-            self.board.setup()
+        self.board.setup()
         if isinstance(self.view, BoardView):
             for widget in self.view.window.winfo_children():
                 widget.destroy()
@@ -187,7 +177,7 @@ class GameController:
         self.updateTimer()
 
     def updateTimer(self):
-        if self.game_over or not self.view.window.winfo_exists():
+        if self.game_over:
             return
 
         elapsed_time = self.getTimeElapsed()

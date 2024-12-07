@@ -2,7 +2,6 @@ import tkinter as tk
 
 class ModeView:
     def __init__(self, root):
-        print("Constructing ModeView")
         self.mode = None
         self.window = tk.Toplevel(root)
         self.window.title("Game Mode")
@@ -13,7 +12,6 @@ class ModeView:
         text_button.pack(pady=10)
 
     def set_mode(self, mode):
-        print(f"Setting mode")
         if mode == "graphical":
             self.mode = "graphical"
         elif mode == "text":

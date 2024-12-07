@@ -5,7 +5,7 @@ from Models.cell_model import Cell
 
 class BoardModel:
     # Sets the initial board parameters
-    def __init__(self, rows=8, cols=8, mines=10, treasures=1, mine_positions=None, treasure_positions=None):
+    def __init__(self, rows=8, cols=8, mines=10, treasures=1, mine_positions=None, treasure_positions=None, is_testing=False):
         self.rows = rows
         self.cols = cols
         self.mines = mines
@@ -13,6 +13,7 @@ class BoardModel:
         self.mine_positions = mine_positions if mine_positions is not None else []
         self.treasure_positions = treasure_positions if treasure_positions is not None else []
         self.grid = [[Cell() for _ in range(cols)] for _ in range(rows)]
+        self.is_testing = is_testing
     
     # Sets up the initial board state. A reengineered version of the setup function.
     def setup(self):
@@ -22,21 +23,20 @@ class BoardModel:
         self.startTime = None
         self.grid = [[Cell() for _ in range(self.cols)] for _ in range(self.rows)]
 
-        if not any(cell.is_mine for row in self.grid for cell in row):
-            if not self.mine_positions:
-                # Creates the mine positions if positions aren't know
-                self.mine_positions = random.sample(
-                    [(x, y) for x in range(self.rows) for y in range(self.cols)], self.mines
-                )
+        if not self.is_testing:
+            # Creates the mine positions if positions aren't know
+            self.mine_positions = random.sample(
+                [(x, y) for x in range(self.rows) for y in range(self.cols)], self.mines
+            )
             # Sets is_mine property to true for each mine position
             for x, y in self.mine_positions:
                 self.grid[x][y].is_mine = True
 
-            if not self.treasure_positions:
-                # Creates the treasure positions if positions aren't know
-                self.treasure_positions = random.sample(
-                    [(x, y) for x in range(self.rows) for y in range(self.cols) if (x, y) not in self.mine_positions], self.treasures
-                )
+            # Creates the treasure positions if positions aren't know
+            self.treasure_positions = random.sample(
+                [(x, y) for x in range(self.rows) for y in range(self.cols) if (x, y) not in self.mine_positions], self.treasures
+            )
+            
             for x, y in self.treasure_positions:
                 self.grid[x][y].is_treasure = True
         
