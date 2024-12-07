@@ -7,6 +7,21 @@ from Models.board_model import BoardModel
 
 class BoardView:
     def __init__(self, board, root, controller=None):
+        """
+        Initializes the BoardView for the graphical Minesweeper game.
+
+        Preconditions:
+        - `board` is an instance of BoardModel.
+        - `root` is a valid Tkinter root or parent window.
+        - `controller` is either None or an instance of GameController.
+
+        Postconditions:
+        - `self.board` is set to the provided `board`.
+        - `self.controller` is set to the provided `controller`.
+        - `self.window` is created as a Toplevel window for the game.
+        - `self.tiles` is initialized as an empty dictionary.
+        - `self.status_label` is initialized as None.
+        """
         # Defines controller and game board
         self.controller = controller
         self.board = board
@@ -20,6 +35,18 @@ class BoardView:
     
     # Builds the graphical UI for the game
     def generateUI(self):
+        """
+        Builds the graphical UI for the game board.
+
+        Preconditions:
+        - `self.board` contains valid rows and columns.
+
+        Postconditions:
+        - If `self.frame` exists, it is destroyed before creating a new one.
+        - `self.frame` is populated with buttons representing the tiles.
+        - Each button is bound to a left-click (`<Button-1>`) or right-click (`<Button-3>`) event.
+        - A `status_label` is added to display the game status.
+        """
         if hasattr(self, "frame") and self.frame is not None and self.frame.winfo_exists():
             self.frame.destroy()
         
@@ -53,6 +80,16 @@ class BoardView:
 
     # Updates cells according to their state
     def updateCell(self, x, y):
+        """
+        Updates the display of a cell based on its current state.
+
+        Preconditions:
+        - `x` and `y` are valid indices within the grid dimensions.
+        - `self.board.grid[x][y]` is a valid cell with `is_revealed`, `is_mine`, `is_treasure`, and `adjacent_mines` attributes.
+
+        Postconditions:
+        - Updates the button at position `(x, y)` with the appropriate image based on the cell's state.
+        """
         if not self.window.winfo_exists():
             return
 
@@ -75,15 +112,43 @@ class BoardView:
     
     # Updates elements of the game status including the remaining mines and time elapsed
     def refreshLabel(self, remaining_mines, time_elapsed):
+        """
+        Updates the game status label with the remaining mines and elapsed time.
+
+        Preconditions:
+        - `remaining_mines` is an integer representing the number of unflagged mines.
+        - `time_elapsed` is a string representing the elapsed time.
+
+        Postconditions:
+        - The `status_label` is updated with the provided values if the window and label exist.
+        """
         if self.window.winfo_exists() and self.status_label.winfo_exists():
             self.status_label.config(text=f"Mines: {remaining_mines} Time: {time_elapsed}")
     
     # Wrapper for the onClick function that handles left clicks
     def onClickWrapper(self, x, y):
+        """
+        Creates a lambda function to handle left-clicks on a cell.
+
+        Preconditions:
+        - `x` and `y` are valid indices within the grid dimensions.
+
+        Postconditions:
+        - Returns a lambda function that calls `self.controller.onClick(x, y)` when triggered.
+        """
         return lambda event: self.controller.onClick(x, y)
         
     
     # Wrapper for the onRightClick function that handles right clicks
     def onRightClickWrapper(self, x, y):
+        """
+        Creates a lambda function to handle right-clicks on a cell.
+
+        Preconditions:
+        - `x` and `y` are valid indices within the grid dimensions.
+
+        Postconditions:
+        - Returns a lambda function that calls `self.controller.onRightClick(x, y)` when triggered.
+        """
         return lambda event: self.controller.onRightClick(x, y)
 

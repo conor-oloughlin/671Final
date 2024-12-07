@@ -12,6 +12,19 @@ from Views.difficulty_view import DifficultyView
 
 class GameController:
     def __init__(self, board, view):
+        """
+        Initializes the GameController.
+
+        Preconditions:
+        - `board` is an instance of BoardModel.
+        - `view` is an instance of either BoardView or TextBoardView.
+
+        Postconditions:
+        - Initializes game parameters such as `game_over`, `start_time`, and counters.
+        - Links the controller to the view.
+        - Sets up the game board and initializes the view.
+        - Starts the timer for the game.
+        """
         self.board = board
         self.view = view
         self.game_over = False
@@ -31,6 +44,17 @@ class GameController:
 
     # Takes action when a cell is left clicked on
     def onClick(self, x, y):
+        """
+        Handles logic when a cell is left-clicked.
+
+        Preconditions:
+        - `x` and `y` are valid indices in the board's grid.
+
+        Postconditions:
+        - Reveals the cell if it is not already revealed or flagged.
+        - Ends the game if a mine or treasure is clicked.
+        - Updates the view and checks if the game is won.
+        """
         if self.game_over:
             return
 
@@ -66,6 +90,15 @@ class GameController:
 
     # Refreshes the view based on type
     def updateView(self, x=None, y=None):
+        """
+        Updates the view for a specific cell or refreshes the entire view.
+
+        Preconditions:
+        - `x` and `y` are valid indices, or both are None.
+
+        Postconditions:
+        - Updates the view for the given cell or the entire board.
+        """
         if isinstance(self.view, BoardView):
             if x is not None and y is not None:
                 self.view.updateCell(x,y)
@@ -74,6 +107,15 @@ class GameController:
 
     # Helper to update game board based off of view type
     def refreshView(self):
+        """
+        Refreshes the view based on the current state of the game board.
+
+        Preconditions:
+        - The view type is either BoardView or TextBoardView.
+
+        Postconditions:
+        - Updates the graphical or text-based view to reflect the board's state.
+        """
         if isinstance(self.view, BoardView):
             # Update the view for all revealed cells
             for i in range(self.board.rows):
@@ -85,6 +127,16 @@ class GameController:
 
     # Takes action when a cell is right clicked on
     def onRightClick(self, x, y):
+        """
+        Handles logic when a cell is right-clicked.
+
+        Preconditions:
+        - `x` and `y` are valid indices in the board's grid.
+
+        Postconditions:
+        - Toggles the flagged state of the cell.
+        - Updates the game status and the view.
+        """
         if self.game_over:
             return
 
@@ -112,6 +164,16 @@ class GameController:
 
     # Handles game over logic
     def gameOver(self, won):
+        """
+        Handles the end of the game.
+
+        Preconditions:
+        - `won` is a boolean indicating whether the player won or lost.
+
+        Postconditions:
+        - Reveals all cells and displays the game over message.
+        - Prompts the user to restart or exit the game.
+        """
         self.game_over = True
 
         if hasattr(self, "timer_id"):
@@ -158,6 +220,16 @@ class GameController:
 
     # Restarts the game
     def restart(self):
+        """
+        Restarts the game with the same parameters.
+
+        Preconditions:
+        - None.
+
+        Postconditions:
+        - Resets the board and counters.
+        - Initializes the view for a new game.
+        """
         if hasattr(self, 'timer_id'):
             self.view.window.after_cancel(self.timer_id)
 
@@ -177,6 +249,15 @@ class GameController:
         self.updateTimer()
 
     def updateTimer(self):
+        """
+        Updates the game timer and refreshes the view.
+
+        Preconditions:
+        - None.
+
+        Postconditions:
+        - Updates the timer in the graphical or text-based view.
+        """
         if self.game_over:
             return
 
@@ -191,6 +272,15 @@ class GameController:
             print(f"Time: {elapsed_time}")
 
     def getTimeElapsed(self):
+        """
+        Calculates the elapsed time since the game started.
+
+        Preconditions:
+        - None.
+
+        Postconditions:
+        - Returns a string representing the elapsed time in HH:MM:SS format.
+        """
         if self.start_time is None:
             return "00:00:00"
         else:

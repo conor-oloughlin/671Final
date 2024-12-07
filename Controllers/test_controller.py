@@ -13,6 +13,17 @@ from Models.cell_model import Cell
 
 class TestController: 
     def __init__(self, file_path):
+        """
+        Initializes the TestController with a given file path.
+
+        Preconditions:
+        - `file_path` is a valid path to a CSV file containing the board configuration.
+
+        Postconditions:
+        - `self.game_board` is initialized as a `BoardModel` in testing mode.
+        - `self.file_contents` contains the board data read from the file.
+        - `self.is_valid` is set to True if the board is valid, otherwise False.
+        """
         self.file_path = file_path
         self.game_board = BoardModel(is_testing=True)
         self.file_contents = self.read_board(self.file_path)
@@ -20,6 +31,17 @@ class TestController:
 
 
     def read_board(self, file_path):
+        """
+        Reads the board configuration from the specified CSV file.
+
+        Preconditions:
+        - `file_path` is a valid path to a CSV file.
+
+        Postconditions:
+        - `self.game_board.rows` and `self.game_board.cols` are set based on the file's dimensions.
+        - `self.game_board.grid` is populated with `Cell` instances based on the file's content.
+        - Returns the board data as a list of lists.
+        """
         with open(file_path, mode="r") as file:
             reader = csv.reader(file)
             tmp = [[int(cell) for cell in row] for row in reader]
@@ -35,6 +57,16 @@ class TestController:
         return tmp
 
     def validate_board(self, board):
+        """
+        Validates the board configuration.
+
+        Preconditions:
+        - `board` is a list of lists representing the board.
+
+        Postconditions:
+        - Returns True if the board is valid, otherwise False.
+        - Prints error messages for invalid board properties.
+        """
         # Check board size
         if len(board) != 8 or any(len(row) != 8 for row in board):
             print("Invalid board size")
@@ -70,7 +102,15 @@ class TestController:
 
     # Validates mine locations with relaxed constraints. These constraints were relaxed as it was not possible to generate a valid board with the original constraints.
     def validate_mines(self, mines):
-        
+        """
+        Validates the placement of mines with specific constraints.
+
+        Preconditions:
+        - `mines` is a list of (row, column) tuples representing mine positions.
+
+        Postconditions:
+        - Returns True if the mine placement is valid, otherwise False.
+        """
         # ensures one of the first 8 mines is on a cell where the row and column are equal
         has_diagonal = False
         for mine in mines:

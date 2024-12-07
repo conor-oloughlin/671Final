@@ -9,6 +9,23 @@ from Controllers.test_controller import TestController
 import tkinter as tk
 
 if __name__=="__main__":
+    """
+    Preconditions:
+    - Tkinter (`tk`) is imported and available.
+    - `ModeView`, `TestingView`, `DifficultyView`, `BoardModel`, and other referenced classes are correctly defined.
+
+    Postconditions:
+    - `ModeView` allows the user to select between "graphical", "text", or no mode.
+    - If testing mode is selected:
+        - `uploadCSV` prompts for a test board file.
+        - A valid test board is loaded into a `BoardModel`.
+        - The program exits if the test board is invalid.
+    - If a difficulty level is selected:
+        - A `BoardModel` is instantiated with the corresponding rows, columns, mines, and treasures.
+    - Depending on the selected mode:
+        - In graphical mode, a `BoardView` and `GameController` are instantiated, and the game runs in a graphical window.
+        - In text mode, a `TextBoardView` and `GameController` are instantiated, and the game runs in a console-based loop.
+    """
     # Creates the root window and hides it
     root = tk.Tk("root")
     root.withdraw()
